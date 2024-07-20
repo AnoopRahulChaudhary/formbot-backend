@@ -1,5 +1,8 @@
 import express from "express";
 import "dotenv/config";
+import { connectToDb } from "./util/db.js";
+
+const PORT = process.env.PORT;
 
 const app = express();
 
@@ -10,12 +13,17 @@ app.get("/health", (req, res) => {
   });
 });
 
-const PORT = process.env.PORT;
-app.listen(PORT, (error) => {
-  if (error) {
-    console.error(error);
-    throw error;
-  }
+async function main() {
+  await connectToDb();
 
-  console.log(`server up and running on port ${PORT}`);
-});
+  app.listen(PORT, async (error) => {
+    if (error) {
+      console.log(`Server not started. ${error.message}`);
+      return;
+    }
+
+    console.log(`server up and running on port ${PORT}`);
+  });
+}
+
+main();
