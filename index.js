@@ -3,6 +3,7 @@ import "dotenv/config";
 import { connectToDb } from "./util/db.js";
 import userRouter from "./src/routes/userRouter.js";
 import bodyParser from "body-parser";
+import handleError from "./src/middleware/errorHandler.js";
 
 const PORT = process.env.PORT;
 
@@ -17,6 +18,8 @@ app.get("/health", (req, res) => {
   });
 });
 app.use("/user", userRouter);
+
+app.use(handleError);
 
 async function main() {
   await connectToDb();
