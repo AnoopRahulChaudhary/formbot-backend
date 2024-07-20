@@ -1,10 +1,14 @@
 import express from "express";
 import "dotenv/config";
 import { connectToDb } from "./util/db.js";
+import userRouter from "./src/routes/userRouter.js";
+import bodyParser from "body-parser";
 
 const PORT = process.env.PORT;
 
 const app = express();
+
+app.use(bodyParser.json());
 
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -12,6 +16,7 @@ app.get("/health", (req, res) => {
     time: new Date(),
   });
 });
+app.use("/user", userRouter);
 
 async function main() {
   await connectToDb();
