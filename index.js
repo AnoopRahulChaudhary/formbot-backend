@@ -1,7 +1,8 @@
 import express from "express";
 import "dotenv/config";
 import { connectToDb } from "./util/db.js";
-import userRouter from "./src/routes/userRouter.js";
+import userRoute from "./src/routes/userRoute.js";
+import healthRoute from "./src/routes/healthRoute.js";
 import bodyParser from "body-parser";
 import handleError from "./src/middleware/errorHandler.js";
 
@@ -11,13 +12,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    message: `Formbot server up and running.`,
-    time: new Date(),
-  });
-});
-app.use("/user", userRouter);
+app.use("/health", healthRoute);
+app.use("/user", userRoute);
 
 app.use(handleError);
 
