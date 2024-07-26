@@ -1,14 +1,14 @@
 import mongoose, { Schema, SchemaType } from "mongoose";
 
 const formSchema = new mongoose.Schema({
-  formName: {
+  name: {
     type: String,
     required: true,
   },
   flow: [{}],
   theme: {
-    type: String,
-    required: true,
+    name: String,
+    color: String,
   },
   responses: [
     {
@@ -34,3 +34,7 @@ const formSchema = new mongoose.Schema({
     type: mongoose.ObjectId,
   },
 });
+
+const form = mongoose.model("Form", formSchema);
+
+export default form;

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .container {
+        width: 100vw;
+        height: 100vh;
+        padding: 1.5rem 2rem;
+      }
+
+      .bubble {
+        border: 1px solid blue;
+        margin: 10px;
+        width: 80%;
+      }
+
+      .input {
+        border: 1px solid green;
+        margin: 10px;
+        width: 80%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="container form"
+      style="background-color: <%= formThemeColor %>"
+    ></div>
+    <script>
+      function wait(timeInMilliSecond) {
+        return new Promise((resolve, _) =>
+          setTimeout(() => {
+            resolve("time completed");
+          }, timeInMilliSecond)
+        );
+      }
+
+      let isInputTakenAndSaved = false;
+      function isInputCompleted() {
+        return new Promise((resolve, _) => {
+          const interval = setInterval(() => {
+            if (isInputTakenAndSaved) {
+              clearTimeout(interval);
+              resolve("Success");
+            }
+          }, 100);
+        });
+      }
+
+      function handleInputSaveOnCLick() {
+        isInputTakenAndSaved = true;
+      }
+
+      const formId = "<%= formId %>";
+      const formFlow = JSON.parse('<%- JSON.stringify(formFlow) %>');
+
+      const bubbleHtml = `<div class="bubble">bubble elemet</div>`;
+      const inputHtml = `<div class="bubble">input elemet <button OnClick="handleInputSaveOnCLick()">Save</button></div> `;
+      const form = document.querySelector(".form");
+
+      async function main() {
+        for (let flowElement of formFlow) {
+          if (flowElement.type.startsWith("bubble")) {
+            form.insertAdjacentHTML("beforeend", bubbleHtml);
+            await wait(500);
+          } else {
+            form.insertAdjacentHTML("beforeend", inputHtml);
+            isInputTakenAndSaved = false;
+            await isInputCompleted();
+          }
+        }
+      }
+
+      main();
+    </script>
+  </body>
+</html>

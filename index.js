@@ -3,17 +3,21 @@ import "dotenv/config";
 import { connectToDb } from "./util/db.js";
 import userRoute from "./src/routes/userRoute.js";
 import healthRoute from "./src/routes/healthRoute.js";
+import formRoute from "./src/routes/formRoute.js";
 import bodyParser from "body-parser";
 import handleError from "./src/middleware/errorHandler.js";
+import cors from "cors";
 
 const PORT = process.env.PORT;
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use("/health", healthRoute);
 app.use("/user", userRoute);
+app.use("/form", formRoute);
 
 app.use(handleError);
 
