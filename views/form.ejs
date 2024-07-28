@@ -6,21 +6,39 @@
     <title>Document</title>
     <style>
       .container {
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
         padding: 1.5rem 2rem;
       }
 
       .bubble {
-        border: 1px solid blue;
-        margin: 10px;
+        /* border: 1px solid blue; */
+        margin: 1rem auto 1rem 0;
         width: 80%;
       }
 
+      .bubble__img,
+      .bubble__video,
+      .bubble__gif {
+        width: 200px;
+      }
+
+      .bubble img,
+      .bubble video {
+        width: 100%;
+      }
+
       .input {
-        border: 1px solid green;
-        margin: 10px;
+        /* border: 1px solid green; */
+        margin: 1rem 0 1rem auto;
         width: 80%;
+      }
+
+      .input__rate {
+        appearance: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background-color: #1a5fff;
       }
     </style>
   </head>
@@ -57,17 +75,158 @@
       const formId = "<%= formId %>";
       const formFlow = JSON.parse(`<%- JSON.stringify(formFlow) %>`);
 
-      const bubbleHtml = `<div class="bubble">bubble elemet</div>`;
-      const inputHtml = `<div class="bubble">input elemet <button OnClick="handleInputSaveOnCLick()">Save</button></div> `;
-      const form = document.querySelector(".form");
+      function getBubbleTextHtml(textValue) {
+        return `<div class="bubble bubble__text">${textValue}</div>`;
+      }
 
+      function getBubbleImageHtml(imageLink) {
+        return `<div class="bubble bubble__img">
+                  <img src="${imageLink}" alt="${imageLink}"/>
+                </div>`;
+      }
+
+      function getBubbleVideoHtml(videoLink) {
+        return `<div class="bubble bubble__video">
+                  <video controls autoplay>
+                    <source src="${videoLink}">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>`;
+      }
+
+      function getBubbleGIFHtml(gifLink) {
+        return `<div class="bubble bubble__gif">
+                  <img src="${gifLink}" alt="${gifLink}"/>
+                </div>`;
+      }
+
+      function saveUserInput(event, formId, flowElementName) {
+        event.preventDefault();
+        let input;
+        if (flowElementName.startsWith("Input Button")) {
+          input = "dummy button value";
+        } else {
+          input = new FormData(event.target).get(flowElementName);
+        }
+        console.log(
+          `data to save : formId ${formId}, flowElementName ${flowElementName}, input ${input}, `
+        );
+        isInputTakenAndSaved = true;
+      }
+
+      function getInputTextHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input input__text" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input type="text" name="${flowElementName}" value="">
+                  <input class="input-save-btn" type="submit" value="submit"/>
+                </form>`;
+      }
+
+      function getInputNumberHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input input__number" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input type="number" name="${flowElementName}" value="">
+                  <input class="input-save-btn" type="submit" value="submit"/>
+                </form>`;
+      }
+
+      function getInputEmailHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input input__email" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input type="email" name="${flowElementName}" value="">
+                  <input class="input-save-btn" type="submit" value="submit"/>
+                </form>`;
+      }
+
+      function getInputPhoneHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input input__phone" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input type="tel" name="${flowElementName}" value="">
+                  <input class="input-save-btn" type="submit" value="submit"/>
+                </form>`;
+      }
+
+      function getInputDateHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input input__date" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input type="date" name="${flowElementName}" value="">
+                  <input class="input-save-btn" type="submit" value="submit"/>
+                </form>`;
+      }
+
+      function getInputRatingHtml(formId, flowElementName) {
+        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="1">1</input>
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="2">2</input>
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="3">3</input>
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="4">4</input>
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="5">5</input>
+                    <input type="submit" value="submit"/>
+                  </form>`;
+      }
+
+      function getInputButtonHtml(formId, flowElementName, flowElementValue) {
+        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+                  <input class="input__btn" type="submit" value="${flowElementValue}"/>
+                </form>`;
+      }
+
+      function getInputButtonHtml(formId, flowElementName, flowElementValue) {
+        return `<div class=input>
+                  <button class="input__btn" onclick="${formId}, ${flowElementName}, ${flowElementValue}">${flowElementValue}<>
+                </div>`;
+      }
+
+      function getBubbleHtml(elementType, elementValue) {
+        switch (elementType) {
+          case "bubbleText":
+            return getBubbleTextHtml(elementValue);
+          case "bubbleImage":
+            return getBubbleImageHtml(elementValue);
+          case "bubbleVideo":
+            return getBubbleVideoHtml(elementValue);
+          case "bubbleGIF":
+            return getBubbleGIFHtml(elementValue);
+          default:
+            return "";
+        }
+      }
+
+      function getInputHtml(formId, flowElement) {
+        switch (flowElement.type) {
+          case "inputText":
+            return getInputTextHtml(formId, flowElement.name);
+          case "inputNumber":
+            return getInputNumberHtml(formId, flowElement.name);
+          case "inputEmail":
+            return getInputEmailHtml(formId, flowElement.name);
+          case "inputPhone":
+            return getInputPhoneHtml(formId, flowElement.name);
+          case "inputDate":
+            return getInputDateHtml(formId, flowElement.name);
+          case "inputRate":
+            return getInputRatingHtml(formId, flowElement.name);
+          case "inputButton":
+            return getInputButtonHtml(
+              formId,
+              flowElement.name,
+              flowElement.value
+            );
+          default:
+            return "";
+        }
+      }
+
+      const form = document.querySelector(".form");
       async function main() {
         for (let flowElement of formFlow) {
-          if (flowElement.type.startsWith("bubble")) {
-            form.insertAdjacentHTML("beforeend", bubbleHtml);
+          const type = flowElement.type;
+          if (type.startsWith("bubble")) {
+            form.insertAdjacentHTML(
+              "beforeend",
+              getBubbleHtml(type, flowElement.value)
+            );
             await wait(500);
           } else {
-            form.insertAdjacentHTML("beforeend", inputHtml);
+            form.insertAdjacentHTML(
+              "beforeend",
+              getInputHtml(formId, flowElement)
+            );
             isInputTakenAndSaved = false;
             await isInputCompleted();
           }
