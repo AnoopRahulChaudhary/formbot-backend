@@ -57,13 +57,16 @@ async function getFormToFill(req, res, next) {
 }
 
 function getFormResponseState(existingInputsValue) {
+  let emptyInputCount = 0;
   for (let key in existingInputsValue) {
+    console.debug(`key ${key} and value ${existingInputsValue[key]}`);
     if (!existingInputsValue[key]) {
-      return "STARTED";
+      emptyInputCount++;
     }
   }
 
-  return "COMPLETED";
+  const state = emptyInputCount === 1 ? "COMPLETED" : "STARTED";
+  return state;
 }
 
 function createUpdatedFormResponse(
