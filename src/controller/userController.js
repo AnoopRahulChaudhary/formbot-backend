@@ -9,9 +9,12 @@ async function registerUser(req, res, next) {
     const hash = await encodeSecret(req.body.password);
     const user = new User({ ...req.body, password: hash });
     user.save();
+    const token = generateToken(user);
     res.status(201).json({
       status: "Success",
       message: "User registered successfully",
+      username: user.username,
+      token,
     });
   } catch (error) {
     next(error);
