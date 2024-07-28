@@ -40,6 +40,10 @@
         height: 20px;
         background-color: #1a5fff;
       }
+
+      input[type="radio"]:checked {
+        background-color: #ff8e21;
+      }
     </style>
   </head>
   <body>
@@ -48,6 +52,10 @@
       style="background-color: <%= formThemeColor %>"
     ></div>
     <script>
+      const formId = "<%= formId %>";
+      const responseId = "<%= responseId %>";
+      const formFlow = JSON.parse(`<%- JSON.stringify(formFlow) %>`);
+
       function wait(timeInMilliSecond) {
         return new Promise((resolve, _) =>
           setTimeout(() => {
@@ -67,13 +75,6 @@
           }, 100);
         });
       }
-
-      function handleInputSaveOnCLick() {
-        isInputTakenAndSaved = true;
-      }
-
-      const formId = "<%= formId %>";
-      const formFlow = JSON.parse(`<%- JSON.stringify(formFlow) %>`);
 
       function getBubbleTextHtml(textValue) {
         return `<div class="bubble bubble__text">${textValue}</div>`;
@@ -100,58 +101,86 @@
                 </div>`;
       }
 
-      function saveUserInput(event, formId, flowElementName) {
+      async function saveUserInput(event, flowElementName) {
         event.preventDefault();
         let input;
         if (flowElementName.startsWith("Input Button")) {
-          input = "dummy button value";
+          input = event.submitter.value;
         } else {
           input = new FormData(event.target).get(flowElementName);
         }
-        console.log(
-          `data to save : formId ${formId}, flowElementName ${flowElementName}, input ${input}, `
+
+        console.debug(
+          `data to save : formId ${formId}, responseId ${responseId}, flowElementName ${flowElementName}, input ${input}, `
         );
+
+        const response = await fetch(
+          "http://localhost:4000/form/saveResponse",
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              responseId,
+              flowElementName,
+              flowElementValue: input,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          console.error(response);
+          throw Error(
+            `Failed to save response, status code ${response.status}`
+          );
+        }
+
+        const jsonResponse = await response.json();
+        console.debug(`Response recieved : ${JSON.stringify(jsonResponse)}`);
+
         isInputTakenAndSaved = true;
       }
 
-      function getInputTextHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input input__text" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputTextHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input input__text" onsubmit="saveUserInput(event, '${flowElementName}');">
                   <input type="text" name="${flowElementName}" value="">
                   <input class="input-save-btn" type="submit" value="submit"/>
                 </form>`;
       }
 
-      function getInputNumberHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input input__number" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputNumberHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input input__number" onsubmit="saveUserInput(event, '${flowElementName}');">
                   <input type="number" name="${flowElementName}" value="">
                   <input class="input-save-btn" type="submit" value="submit"/>
                 </form>`;
       }
 
-      function getInputEmailHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input input__email" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputEmailHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input input__email" onsubmit="saveUserInput(event, '${flowElementName}');">
                   <input type="email" name="${flowElementName}" value="">
                   <input class="input-save-btn" type="submit" value="submit"/>
                 </form>`;
       }
 
-      function getInputPhoneHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input input__phone" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputPhoneHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input input__phone" onsubmit="saveUserInput(event, '${flowElementName}');">
                   <input type="tel" name="${flowElementName}" value="">
                   <input class="input-save-btn" type="submit" value="submit"/>
                 </form>`;
       }
 
-      function getInputDateHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input input__date" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputDateHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input input__date" onsubmit="saveUserInput(event, '${flowElementName}');">
                   <input type="date" name="${flowElementName}" value="">
                   <input class="input-save-btn" type="submit" value="submit"/>
                 </form>`;
       }
 
-      function getInputRatingHtml(formId, flowElementName) {
-        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
-                    <input class="input__rate" type="radio" name="${flowElementName}" value="1">1</input>
+      function getInputRatingHtml(flowElementName) {
+        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event,'${flowElementName}');">
+                    <input class="input__rate" type="radio" name="${flowElementName}" value="1" placeholder="1">1</input>
                     <input class="input__rate" type="radio" name="${flowElementName}" value="2">2</input>
                     <input class="input__rate" type="radio" name="${flowElementName}" value="3">3</input>
                     <input class="input__rate" type="radio" name="${flowElementName}" value="4">4</input>
@@ -160,53 +189,49 @@
                   </form>`;
       }
 
-      function getInputButtonHtml(formId, flowElementName, flowElementValue) {
-        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event, '${formId}', '${flowElementName}');">
+      function getInputButtonHtml(flowElementName, flowElementValue) {
+        return `<form id="${flowElementName}" class="input" onsubmit="saveUserInput(event,'${flowElementName}');">
                   <input class="input__btn" type="submit" value="${flowElementValue}"/>
                 </form>`;
       }
 
-      function getInputButtonHtml(formId, flowElementName, flowElementValue) {
-        return `<div class=input>
-                  <button class="input__btn" onclick="${formId}, ${flowElementName}, ${flowElementValue}">${flowElementValue}<>
-                </div>`;
+      function getInputButtonHtml(flowElementName, flowElementValue) {
+        return `<form class=input onsubmit="saveUserInput(event, '${flowElementName}');">
+                  <input class="input__btn" type="submit" value="${flowElementValue}"/>
+                </form>`;
       }
 
-      function getBubbleHtml(elementType, elementValue) {
-        switch (elementType) {
+      function getBubbleHtml(flowElement) {
+        switch (flowElement.type) {
           case "bubbleText":
-            return getBubbleTextHtml(elementValue);
+            return getBubbleTextHtml(flowElement.value);
           case "bubbleImage":
-            return getBubbleImageHtml(elementValue);
+            return getBubbleImageHtml(flowElement.value);
           case "bubbleVideo":
-            return getBubbleVideoHtml(elementValue);
+            return getBubbleVideoHtml(flowElement.value);
           case "bubbleGIF":
-            return getBubbleGIFHtml(elementValue);
+            return getBubbleGIFHtml(flowElement.value);
           default:
             return "";
         }
       }
 
-      function getInputHtml(formId, flowElement) {
+      function getInputHtml(flowElement) {
         switch (flowElement.type) {
           case "inputText":
-            return getInputTextHtml(formId, flowElement.name);
+            return getInputTextHtml(flowElement.name);
           case "inputNumber":
-            return getInputNumberHtml(formId, flowElement.name);
+            return getInputNumberHtml(flowElement.name);
           case "inputEmail":
-            return getInputEmailHtml(formId, flowElement.name);
+            return getInputEmailHtml(flowElement.name);
           case "inputPhone":
-            return getInputPhoneHtml(formId, flowElement.name);
+            return getInputPhoneHtml(flowElement.name);
           case "inputDate":
-            return getInputDateHtml(formId, flowElement.name);
+            return getInputDateHtml(flowElement.name);
           case "inputRate":
-            return getInputRatingHtml(formId, flowElement.name);
+            return getInputRatingHtml(flowElement.name);
           case "inputButton":
-            return getInputButtonHtml(
-              formId,
-              flowElement.name,
-              flowElement.value
-            );
+            return getInputButtonHtml(flowElement.name, flowElement.value);
           default:
             return "";
         }
@@ -215,20 +240,19 @@
       const form = document.querySelector(".form");
       async function main() {
         for (let flowElement of formFlow) {
+          console.debug(
+            `next flow element: type ${flowElement.type}, name${flowElement.name}`
+          );
+
           const type = flowElement.type;
           if (type.startsWith("bubble")) {
-            form.insertAdjacentHTML(
-              "beforeend",
-              getBubbleHtml(type, flowElement.value)
-            );
-            await wait(500);
+            form.insertAdjacentHTML("beforeend", getBubbleHtml(flowElement));
+            await wait(1000);
           } else {
-            form.insertAdjacentHTML(
-              "beforeend",
-              getInputHtml(formId, flowElement)
-            );
+            form.insertAdjacentHTML("beforeend", getInputHtml(flowElement));
             isInputTakenAndSaved = false;
             await isInputCompleted();
+            await wait(1000);
           }
         }
       }

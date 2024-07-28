@@ -2,7 +2,8 @@ function handleError(error, req, res, next) {
   console.error(error);
 
   const statusCode = error.statusCode || 500;
-  const errorMessage = error.message || "Internal Server error";
+  const errorMessage =
+    statusCode === 500 ? "Internal Server error" : error.message;
 
   res.status(statusCode).json({
     status: "fail",
