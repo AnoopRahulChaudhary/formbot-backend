@@ -1,4 +1,5 @@
 import FormNotFoundError from "../error/formNotFound.js";
+import InvalidIdError from "../error/invalidId.js";
 import Form from "../model/Form.js";
 import FormResponse from "../model/FormResponse.js";
 
@@ -13,6 +14,55 @@ async function addFormDetails(req, res, next) {
         formId: form._id,
         link: `http://localhost:4000/form/userInput/${form._id}`,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updatedFormDetails(req, res, next) {
+  try {
+    const formId = req.params.id;
+    const formDetailsToUpdate = {
+      ...req.body,
+    };
+    console.debug(
+      `form-details to update ${formDetailsToUpdate} for formId ${formId}`
+    );
+    const updatedForm = await Form.findByIdAndUpdate(
+      formId,
+      formDetailsToUpdate
+    );
+    if (!updatedForm) {
+      throw new InvalidIdError("Invalid formId.");
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "Form updated successfully",
+      formShareDetails: {
+        formId: form._id,
+        link: `http://localhost:4000/form/userInput/${form._id}`,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteForm(req, res, next) {
+  try {
+    const formId = req.params.id;
+    console.debug(`deleting form for formId: ${formId}`);
+    await deleteResponseForFormIds([formId]);
+    const deletedForm = await Form.findByIdAndDelete(formId);
+    if (!deletedForm) {
+      throw new InvalidIdError("invalid form id");
+    }
+
+    res.status(200).json({
+      status: "Success",
+      message: "Form deleted successfully",
     });
   } catch (error) {
     next(error);
@@ -154,4 +204,6 @@ export {
   getFormToFill,
   saveFormResponse,
   deleteFormsUnderFolder,
+  updatedFormDetails,
+  deleteForm,
 };
