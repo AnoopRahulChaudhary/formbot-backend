@@ -26,8 +26,8 @@ async function addFormDetails(req, res, next) {
     res.status(201).json({
       status: "Success",
       message: "Form added successfully",
+      formId: form._id,
       formShareDetails: {
-        formId: form._id,
         link: `http://localhost:4000/form/userInput/${form._id}`,
       },
     });
@@ -58,8 +58,8 @@ async function updatedFormDetails(req, res, next) {
     res.status(200).json({
       status: "Success",
       message: "Form updated successfully",
+      formId: updatedForm._id,
       formShareDetails: {
-        formId: updatedForm._id,
         link: `http://localhost:4000/form/userInput/${updatedForm._id}`,
       },
     });
