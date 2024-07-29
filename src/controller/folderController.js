@@ -1,6 +1,22 @@
 import Folder from "../model/Folder";
 import { deleteFormsUnderFolder } from "./formController";
 
+async function getUserFolders(req, res, next) {
+  try {
+    const userId = req.userId;
+    const userFolders = await Folder.find({ refUserId: userId }).select(
+      "-refUserId"
+    );
+
+    res.status(200).json({
+      status: "Success",
+      folders: userFolders,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function addFolder(req, res, next) {
   try {
     const folder = new Folder({ ...req.body });
@@ -34,4 +50,4 @@ async function deleteFolder(req, res, next) {
   }
 }
 
-export { addFolder, deleteFolder };
+export { getUserFolders, addFolder, deleteFolder };
