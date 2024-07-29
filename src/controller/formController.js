@@ -4,6 +4,21 @@ import InvalidIdError from "../error/invalidId.js";
 import Form from "../model/Form.js";
 import FormResponse from "../model/FormResponse.js";
 
+async function getUserForms(req, res, next) {
+  try {
+    const userId = req.userId;
+    const userForms = await Form.find({ refUserId: userId }).select(
+      "-refUserId"
+    );
+    res.status(200).json({
+      status: "Success",
+      forms: userForms,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function addFormDetails(req, res, next) {
   try {
     const form = new Form({ ...req.body });

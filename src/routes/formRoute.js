@@ -12,6 +12,7 @@ import verifyToken from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
+router.get("/", verifyToken, getUserForms);
 router.post("/add", verifyToken, addFormDetails);
 router.post("/update/:id", verifyToken, updatedFormDetails);
 router.delete("/delete/:id", verifyToken, deleteForm);
