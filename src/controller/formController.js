@@ -21,7 +21,7 @@ async function getUserForms(req, res, next) {
 
 async function addFormDetails(req, res, next) {
   try {
-    const form = new Form({ ...req.body });
+    const form = new Form({ ...req.body, refUserId: req.userId });
     await form.save();
     res.status(201).json({
       status: "Success",

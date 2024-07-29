@@ -19,7 +19,7 @@ async function getUserFolders(req, res, next) {
 
 async function addFolder(req, res, next) {
   try {
-    const folder = new Folder({ ...req.body });
+    const folder = new Folder({ ...req.body, refUserId: req.userId });
     await folder.save();
     res.status(201).json({
       status: "Success",
