@@ -125,4 +125,33 @@ async function saveFormResponse(req, res, next) {
   }
 }
 
-export { addFormDetails, getFormToFill, saveFormResponse };
+async function deleteResponseForFormIds(formIds) {
+  try {
+    console.debug(`deleting formResponse for formIds ${formIds}`);
+    await FormResponse.deleteMany({ refFormId: { $in: formIds } });
+  } catch (error) {
+    console.error(`Error in deletion the response with formIds: ${formIds}`);
+    throw error;
+  }
+}
+
+async function deleteFormsUnderFolder(folderId) {
+  try {
+    const formIds = await Form.find({ refFolderId: folderId }).select("_id");
+    console.debug(
+      `forms will be deleted for ids ${formIds} under folderId ${folderId}`
+    );
+    await deleteResponseForFormIds(formIds);
+    await Form.deleteMany({ refFolderId: folderId });
+  } catch (error) {
+    console.error(`Error in deleting forms under folderId : ${folderId}`);
+    throw error;
+  }
+}
+
+export {
+  addFormDetails,
+  getFormToFill,
+  saveFormResponse,
+  deleteFormsUnderFolder,
+};
