@@ -3,7 +3,6 @@ import FormNotFoundError from "../error/formNotFound.js";
 import InvalidIdError from "../error/invalidId.js";
 import Form from "../model/Form.js";
 import FormResponse from "../model/FormResponse.js";
-import { successResponse } from "../../../formbot-frontend/src/api/responseHandler.js";
 
 async function addFormDetails(req, res, next) {
   try {
@@ -259,4 +258,5 @@ export {
   deleteFormsUnderFolder,
   updatedFormDetails,
   deleteForm,
+  getUserResponse,
 };
