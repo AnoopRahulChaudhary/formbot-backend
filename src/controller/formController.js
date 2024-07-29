@@ -43,7 +43,9 @@ async function updatedFormDetails(req, res, next) {
       ...req.body,
     };
     console.debug(
-      `form-details to update ${formDetailsToUpdate} for formId ${formId}`
+      `form-details to update ${JSON.stringify(
+        formDetailsToUpdate
+      )} for formId ${formId}`
     );
     const updatedForm = await Form.findByIdAndUpdate(
       formId,
@@ -57,8 +59,8 @@ async function updatedFormDetails(req, res, next) {
       status: "Success",
       message: "Form updated successfully",
       formShareDetails: {
-        formId: form._id,
-        link: `http://localhost:4000/form/userInput/${form._id}`,
+        formId: updatedForm._id,
+        link: `http://localhost:4000/form/userInput/${updatedForm._id}`,
       },
     });
   } catch (error) {
