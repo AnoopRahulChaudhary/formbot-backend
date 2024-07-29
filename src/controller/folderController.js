@@ -1,5 +1,5 @@
-import Folder from "../model/Folder";
-import { deleteFormsUnderFolder } from "./formController";
+import Folder from "../model/Folder.js";
+import { deleteFormsUnderFolder } from "./formController.js";
 
 async function getUserFolders(req, res, next) {
   try {

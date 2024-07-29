@@ -5,8 +5,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 function verifyToken(req, res, next) {
   try {
-    const token = req.header("Authorization".toLowerCase());
+    const token = req.header("Authorization").split(" ")[1];
     if (!token) {
+      console.debug(`recieved token => ${token}`);
       throw new InvalidTokenError("Token not found or invaild.");
     }
 

@@ -1,5 +1,5 @@
-import InvalidIdError from "../error/invalidId";
-import Folder from "../model/Folder";
+import InvalidIdError from "../error/invalidId.js";
+import Folder from "../model/Folder.js";
 
 async function validateFolderDeleteRequest(req, res, next) {
   try {

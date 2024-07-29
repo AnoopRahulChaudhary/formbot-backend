@@ -3,9 +3,9 @@ import {
   addFolder,
   deleteFolder,
   getUserFolders,
-} from "../controller/folderController";
-import validateFolderDeleteRequest from "../middleware/validateFolderDeleteRequest";
-import verifyToken from "../middleware/verifyToken";
+} from "../controller/folderController.js";
+import validateFolderDeleteRequest from "../middleware/validateFolderDeleteRequest.js";
+import verifyToken from "../middleware/verifyToken.js";
 
 const router = express.Router();
 

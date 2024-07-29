@@ -7,6 +7,7 @@ import formRoute from "./src/routes/formRoute.js";
 import bodyParser from "body-parser";
 import handleError from "./src/middleware/errorHandler.js";
 import cors from "cors";
+import folderRoute from "./src/routes/folderRoute.js";
 
 const PORT = process.env.PORT;
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 app.use("/health", healthRoute);
 app.use("/user", userRoute);
 app.use("/form", formRoute);
+app.use("/folder", folderRoute);
 
 app.use(handleError);
 
