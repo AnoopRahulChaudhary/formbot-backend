@@ -267,6 +267,7 @@ function calculateResponseStats(responseList) {
 }
 
 export {
+  getUserForms,
   addFormDetails,
   getFormToFill,
   saveFormResponse,
