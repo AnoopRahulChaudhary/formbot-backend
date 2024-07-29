@@ -1,7 +1,9 @@
+import { response } from "express";
 import FormNotFoundError from "../error/formNotFound.js";
 import InvalidIdError from "../error/invalidId.js";
 import Form from "../model/Form.js";
 import FormResponse from "../model/FormResponse.js";
+import { successResponse } from "../../../formbot-frontend/src/api/responseHandler.js";
 
 async function addFormDetails(req, res, next) {
   try {
@@ -197,6 +199,57 @@ async function deleteFormsUnderFolder(folderId) {
     console.error(`Error in deleting forms under folderId : ${folderId}`);
     throw error;
   }
+}
+
+async function getUserResponse(req, res, next) {
+  try {
+    const formId = req.params.id;
+    const responseList = await FormResponse.find({ refFormId: formId });
+
+    const successResponse = {
+      status: "Success",
+    };
+
+    if (responseList.length == 0) {
+      successResponse.responseAvailable = false;
+    } else {
+      const responseStatistics = calculateResponseStats(responseList);
+      successResponse.responseStatus = { ...responseStatistics };
+    }
+
+    res.status(200).json({
+      ...successResponse,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+function calculateResponseStats(responseList) {
+  let views = 0,
+    startCount = 0,
+    completionCount = 0,
+    responseData = [];
+
+  views = responseList.length;
+
+  for (const reponse of responseList) {
+    if (reponse.state === "STARTED") {
+      startCount++;
+    } else if (reponse.state === "COMPLETED") {
+      completionCount++;
+    }
+
+    responseData.push(response.inputsValue);
+  }
+
+  const completionRate = completionCount / (startCount + completionCount);
+
+  return {
+    views,
+    starts: startCount,
+    completionRate,
+  };
 }
 
 export {

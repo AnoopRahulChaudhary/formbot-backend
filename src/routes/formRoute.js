@@ -15,5 +15,6 @@ router.post("/update/:id", updatedFormDetails);
 router.delete("/delete/:id", deleteForm);
 router.get("/userInput/:id", getFormToFill);
 router.post("/saveResponse", validateFormResponse, saveFormResponse);
+router.get("/response/:id", getUserResponse);
 
 export default router;
