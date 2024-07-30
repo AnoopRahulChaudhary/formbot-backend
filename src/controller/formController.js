@@ -220,7 +220,14 @@ async function deleteFormsUnderFolder(folderId) {
 async function getUserResponse(req, res, next) {
   try {
     const formId = req.params.id;
-    const responseList = await FormResponse.find({ refFormId: formId });
+
+    console.log(
+      `getting user response for formId : ${formId} and userId: ${req.userId}`
+    );
+
+    const responseList = await FormResponse.find({ refFormId: formId }).select(
+      "-refFormId"
+    );
 
     const successResponse = {
       status: "Success",
@@ -232,6 +239,12 @@ async function getUserResponse(req, res, next) {
       const responseStatistics = calculateResponseStats(responseList);
       successResponse.responseStatus = { ...responseStatistics };
     }
+
+    console.debug(
+      `user response for formId: ${formId} is ${JSON.stringify(
+        successResponse
+      )}`
+    );
 
     res.status(200).json({
       ...successResponse,
@@ -245,26 +258,39 @@ function calculateResponseStats(responseList) {
   let views = 0,
     startCount = 0,
     completionCount = 0,
-    responseData = [];
+    responses = [];
 
+  console.debug(`response list ${responseList}`);
   views = responseList.length;
 
-  for (const reponse of responseList) {
-    if (reponse.state === "STARTED") {
+  for (const response of responseList) {
+    if (response.state === "STARTED") {
       startCount++;
-    } else if (reponse.state === "COMPLETED") {
+    } else if (response.state === "COMPLETED") {
       completionCount++;
     }
 
-    responseData.push(response.inputsValue);
+    const responseData = {};
+    if (response.submittedAt) {
+      responseData.submittedAt = response.submittedAt;
+    }
+
+    for (const inputNameKey in response.inputsValue) {
+      const updatedInputName = inputNameKey.replace("Input ", "");
+      responseData[updatedInputName] = response.inputsValue[inputNameKey];
+    }
+
+    responses.push(responseData);
   }
 
-  const completionRate = completionCount / (startCount + completionCount);
+  const completionRate =
+    (completionCount / (startCount + completionCount)) * 100;
 
   return {
     views,
     starts: startCount,
     completionRate,
+    responseData: responses,
   };
 }
 
